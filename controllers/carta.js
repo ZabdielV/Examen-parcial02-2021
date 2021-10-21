@@ -10,29 +10,43 @@ exports.postAgregarCarta = async (req,res)=>{
     (req.body.color==="rojo" ||req.body.color==="negro")&&
     (req.body.paloCarta==="picas" ||req.body.paloCarta==="corazones" ||req.body.paloCarta==="rombos" ||req.body.paloCarta==="treboles" ) ){
 
-        /* */
-        console.log(req.body)
-    const carta=new Carta(
-{
-    numeracion:req.body.numeracion,
-    color: req.body.color,
-    paloCarta:req.body.paloCarta,
-    _id:new mongoose.Types.ObjectId()
-}
-        )
-    try{
-        await carta.save()
-         console.log(carta)
-        console.log("carta registrada exitosamente")
-        res.json(
-            {
-                estatus:"carta registrada exitosamente"
-            }
-        )
+    /* Se busca si existen repetidos*/
+    const repetido= await Carta.find({
+        numeracion:req.body.numeracion,
+        color: req.body.color,
+        paloCarta:req.body.paloCarta,
+    })
+
+ if(repetido.length===0){
+     console.log("valor no repetido")
+     const carta=new Carta(
+        {
+            numeracion:req.body.numeracion,
+            color: req.body.color,
+            paloCarta:req.body.paloCarta,
+            _id:new mongoose.Types.ObjectId()
         }
-        catch(err){
-        console.log(err)
-        }
+                )
+            try{
+                await carta.save()
+                 //console.log(carta)
+                console.log("carta registrada exitosamente")
+                res.json(
+                    {
+                        estatus:"carta registrada exitosamente"
+                    }
+                )
+                }
+                catch(err){
+                console.log(err)
+                }
+ } else{
+    console.log("valor repetido")
+    res.json({
+        estatus:"valor repetido en base de datos"
+    })
+       }
+
         
       
     }else{
